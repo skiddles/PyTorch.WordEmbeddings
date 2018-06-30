@@ -21,9 +21,9 @@ class NGramLanguageModeler(nn.Module):
 
     def forward(self, inputs):
         embeds = self.embeddings(inputs).view((len(inputs), -1))
-        out = F.relu(self.linear1(embeds))
-        out = self.linear2(out)
-        log_probs = F.log_softmax(out, dim=1)
+        out1 = F.relu(self.linear1(embeds))
+        out2 = self.linear2(out1)
+        log_probs = F.log_softmax(out2, dim=1)
         return log_probs
 
 
@@ -60,17 +60,6 @@ def save_checkpoint(state, filename):
     torch.save(state, filename)
 
 
-def weights_init(m, new=True):
-    if isinstance(m, nn.Embedding):
-        if new:
-            print(m.weight.data)
-            nn.init.xavier_normal(m.weight.data)
-            print(m.weight.data)
-            nn.init.xavier_normal(m.bias.data)
-        else:
-            pass
-
-
 if __name__ == '__main__':
     parms = get_args()
 
@@ -97,17 +86,17 @@ if __name__ == '__main__':
             os.mkdir(os.path.split(parms.save_dir)[0])
         assert (os.path.exists(os.path.split(parms.save_dir)[0])), "It appears that the save_dir could not be created."
         parms.start_epoch = 0
-        weights_init(model, new=True)
+        # weights_init(model, new=True)
     else:
         checkpoint = torch.load(parms.save_dir)
         parms.start_epoch = checkpoint['epoch']
+        print(model.embeddings)
         model.load_state_dict(checkpoint['state_dict'])
+        print(model.embeddings)
         optimizer.load_state_dict(checkpoint['optimizer'])
         print("=> loaded checkpoint '{}' (epoch {})"
               .format(parms.save_dir, checkpoint['epoch']))
 
-        weights_init(model, new=False)
-        model.eval()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     losses = []
@@ -181,9 +170,10 @@ if __name__ == '__main__':
             'optimizer': optimizer.state_dict(),
         }, parms.save_dir)
 
-    # # load best model weights
-    # final_model_wts = copy.deepcopy(model.state_dict())
-    # model.load_state_dict(final_model_wts)
+
+# The loss decreased every iteration over the training data!
+# print(len(losses))
+# print(losses[-1].item())
 
 
 
