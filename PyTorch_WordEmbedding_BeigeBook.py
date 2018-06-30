@@ -60,6 +60,17 @@ def save_checkpoint(state, filename):
     torch.save(state, filename)
 
 
+def weights_init(m, new=True):
+    if isinstance(m, nn.Embedding):
+        if new:
+            print(m.weight.data)
+            nn.init.xavier_normal(m.weight.data)
+            print(m.weight.data)
+            nn.init.xavier_normal(m.bias.data)
+        else:
+            pass
+
+
 if __name__ == '__main__':
     parms = get_args()
 
@@ -86,6 +97,7 @@ if __name__ == '__main__':
             os.mkdir(os.path.split(parms.save_dir)[0])
         assert (os.path.exists(os.path.split(parms.save_dir)[0])), "It appears that the save_dir could not be created."
         parms.start_epoch = 0
+        weights_init(model, new=True)
     else:
         checkpoint = torch.load(parms.save_dir)
         parms.start_epoch = checkpoint['epoch']
@@ -94,6 +106,7 @@ if __name__ == '__main__':
         print("=> loaded checkpoint '{}' (epoch {})"
               .format(parms.save_dir, checkpoint['epoch']))
 
+        weights_init(model, new=False)
         model.eval()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -171,10 +184,6 @@ if __name__ == '__main__':
     # # load best model weights
     # final_model_wts = copy.deepcopy(model.state_dict())
     # model.load_state_dict(final_model_wts)
-
-# The loss decreased every iteration over the training data!
-# print(len(losses))
-# print(losses[-1].item())
 
 
 
