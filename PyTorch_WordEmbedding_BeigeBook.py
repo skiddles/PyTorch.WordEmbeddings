@@ -29,11 +29,11 @@ class NGramLanguageModeler(nn.Module):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--clean', dest='clean_dir',  required=True, default='./TrigramDataset/trigrams_data/Corpus.pkl",
+    parser.add_argument('--clean', dest='clean_dir',  required=True, default=r'./TrigramDataset/trigrams_data/Corpus.pkl',
                         help='the directory to load the cleansed corpus from')
     parser.add_argument('--clip', dest='clip', required=False,
                         help='Limit the number of records for debugging purposes')
-    parser.add_argument('--save', dest='save_dir', required=True,default="./data/final_model.md"
+    parser.add_argument('--save', dest='save_dir', required=True,default=r"./data/final_model.md",
                         help='the directory to save and load the in-progress model from')
     parser.add_argument('--batch-size', dest='MINI_BATCH', type=int, default=1000, metavar='N',
                         help='input batch size for training (default: 1000)')
